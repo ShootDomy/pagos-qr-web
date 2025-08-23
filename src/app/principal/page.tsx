@@ -1,6 +1,8 @@
 "use client";
+import { useObtenerEstadoPago } from "@/hooks/useObtenerEstadoPago";
 import { useTransaccionGenerarQR } from "@/hooks/useTransaccionGenerarQR";
 import {
+  Badge,
   Button,
   Card,
   CardBody,
@@ -35,6 +37,7 @@ const esquema = z.object({
 const Principal = () => {
   const [qrImg, setQrImg] = useState<string | null>(null);
   const [traUuid, setTraUuid] = useState<string | null>(null);
+  const [estadoPago, setEstadoPago] = useState<string | null>(null);
 
   const { mutate: generarQr } = useTransaccionGenerarQR({
     onSuccess: (response: { qr: string; traUuid: string }) => {
@@ -66,6 +69,28 @@ const Principal = () => {
 
   const onError = (error: unknown) => {
     console.log("Errores de validación:", error);
+  };
+
+  // Llamar el hook siempre, pero solo consultar si traUuid existe
+  const estadoPagoQuery = useObtenerEstadoPago({ traUuid });
+
+  const handleEstadoPago = () => {
+    if (estadoPagoQuery.data) {
+      setEstadoPago(estadoPagoQuery.data.traEstado);
+      console.log("Estado de pago:", estadoPagoQuery.data);
+    }
+  };
+
+  const getColorByEstado = (estado: string | null) => {
+    switch (estado) {
+      case "APROBADO":
+        return "green";
+      case "DECLINADO":
+        return "red";
+      case "PENDIENTE":
+      default:
+        return "yellow";
+    }
   };
 
   return (
@@ -106,38 +131,64 @@ const Principal = () => {
         </Button>
       </div>
       <div>
-        <Card
-          direction={{ base: "column", sm: "row" }}
-          overflow="hidden"
-          variant="outline"
-        >
-          {qrImg ? (
+        {qrImg ? (
+          <Card
+            direction={{ base: "column", sm: "row" }}
+            overflow="hidden"
+            variant="outline"
+          >
             <Image
-              objectFit="cover"
-              maxW={{ base: "100%", sm: "200px" }}
+              objectFit="contain"
+              // maxW={{ base: "100%", sm: "200px" }}
+              height="100%"
               src={qrImg}
               alt="QR generado"
               bg="white"
             />
-          ) : (
-            <div style={{ width: 200, height: 200, background: "white" }} />
-          )}
 
-          <Stack>
-            <CardBody>
-              <Heading size="md">Información del pago</Heading>
-              <Text py="2" wordBreak="break-all">
-                {traUuid}
-              </Text>
-            </CardBody>
+            <Stack>
+              <CardBody
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Badge
+                  colorScheme={getColorByEstado(estadoPago)}
+                  mb={4}
+                  fontSize="lg"
+                  px={4}
+                  py={2}
+                  borderRadius="md"
+                >
+                  {estadoPago ? estadoPago : "PENDIENTE"}
+                </Badge>
+                <Heading size="lg" mb={2}>
+                  ${watch("traAmount") ?? ""}
+                </Heading>
+                <Text fontSize="xl" color="gray.600" mb={4}>
+                  {qrImg ? estadoPagoQuery.data?.traCurrency ?? "" : "USD"}
+                </Text>
+                <Text fontSize="md" color="gray.500">
+                  {traUuid ? "Transacción generada" : "Esperando generación"}
+                </Text>
+              </CardBody>
 
-            <CardFooter>
-              <Button colorScheme="purple" width="full" mt={6}>
-                Actualizar estado de pago
-              </Button>
-            </CardFooter>
-          </Stack>
-        </Card>
+              <CardFooter>
+                <Button
+                  colorScheme="purple"
+                  width="full"
+                  mt={6}
+                  onClick={handleEstadoPago}
+                >
+                  Actualizar estado de pago
+                </Button>
+              </CardFooter>
+            </Stack>
+          </Card>
+        ) : (
+          <div style={{ width: 200, height: 200, background: "white" }} />
+        )}
       </div>
     </div>
   );
