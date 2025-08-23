@@ -2,7 +2,7 @@ import React from "react";
 
 export const menuData: IMenuData[] = [
   { nombre: "Principal", link: "/principal", icon: "" },
-  { nombre: "Transacciones", link: "/transacciones", icon: "" },
+  { nombre: "Transacciones", link: "/transaccion", icon: "" },
 ];
 
 export type IMenuData = {

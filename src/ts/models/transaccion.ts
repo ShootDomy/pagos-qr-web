@@ -4,5 +4,6 @@ export interface IGenerarQr {
 }
 
 export interface IGenerarQrResponse {
+  traUuid: string;
   qr: string;
 }

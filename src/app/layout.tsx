@@ -4,6 +4,7 @@ import "./globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import { NavbarWrapper } from "@/components/NavbarWrapper";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
+import { FooterWrapper } from "@/components/FooterWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +33,13 @@ export default function RootLayout({
       >
         <ReactQueryProvider>
           <ChakraProvider>
-            <NavbarWrapper />
-            {children}
+            <header>
+              <NavbarWrapper />
+            </header>
+            <main>{children}</main>
+            <footer>
+              <FooterWrapper />
+            </footer>
           </ChakraProvider>
         </ReactQueryProvider>
       </body>

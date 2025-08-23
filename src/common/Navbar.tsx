@@ -20,11 +20,6 @@ export const Navbar = () => {
       bg="#897DEE"
       px={4}
       color="white"
-      position="fixed"
-      top={0}
-      left={0}
-      width="100%"
-      zIndex={1000}
       boxShadow="md"
       transition="box-shadow 0.2s"
     >
