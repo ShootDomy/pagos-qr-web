@@ -15,10 +15,19 @@ import { menuData } from "@/ts/menu-data";
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // const Links = ["Inicio", "Servicios", "Nosotros", "Contacto"];
-
   return (
-    <Box bg="#897DEE" px={4} color="white">
+    <Box
+      bg="#897DEE"
+      px={4}
+      color="white"
+      position="fixed"
+      top={0}
+      left={0}
+      width="100%"
+      zIndex={1000}
+      boxShadow="md"
+      transition="box-shadow 0.2s"
+    >
       <Flex h={16} alignItems="center" justifyContent="space-between">
         {/* Logo */}
         <Box fontWeight="bold">MiLogo</Box>
@@ -32,6 +41,8 @@ export const Navbar = () => {
           {menuData.map((menu, item) => (
             <Button
               key={item}
+              as="a"
+              href={menu.link || "#"}
               variant="ghost"
               color="white"
               _hover={{ bg: "blue.600" }}
@@ -58,6 +69,8 @@ export const Navbar = () => {
             {menuData.map((menu, item) => (
               <Button
                 key={item}
+                as="a"
+                href={menu.link || "#"}
                 variant="ghost"
                 color="white"
                 _hover={{ bg: "blue.600" }}

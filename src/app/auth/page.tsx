@@ -15,6 +15,8 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const esquema = z.object({
   nombre: z
@@ -36,10 +38,13 @@ const esquema = z.object({
 });
 
 const Auth = () => {
+  const router = useRouter();
+
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errorCorreo, setErrorCorreo] = useState<string | null>(null);
   const [errorContrasena, setErrorContrasena] = useState<string | null>(null);
+  const [token, setToken] = useState<string>("");
 
   const {
     register,
@@ -49,6 +54,7 @@ const Auth = () => {
     resolver: zodResolver(esquema),
   });
 
+  const { mutate: iniciarSesion } = useAuth();
   const handleIniciarSesion = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -66,6 +72,23 @@ const Auth = () => {
     }
 
     setErrorContrasena(null);
+
+    setToken("");
+
+    iniciarSesion(
+      { usuCorreo: correo, usuContrasena: contrasena },
+      {
+        onSuccess: (data) => {
+          setToken(data.token);
+          localStorage.setItem("token", data.token);
+          console.log("Inicio de sesión exitoso:", data);
+          router.push("/principal");
+        },
+        onError: (error) => {
+          console.error("Error al iniciar sesión:", error);
+        },
+      }
+    );
 
     console.log("Correo:", correo);
     console.log("Contraseña:", contrasena);

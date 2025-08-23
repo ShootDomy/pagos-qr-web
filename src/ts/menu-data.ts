@@ -1,7 +1,7 @@
 import React from "react";
 
 export const menuData: IMenuData[] = [
-  { nombre: "Principal", link: "/", icon: "" },
+  { nombre: "Principal", link: "/principal", icon: "" },
   { nombre: "Transacciones", link: "/transacciones", icon: "" },
 ];
 
