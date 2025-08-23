@@ -35,7 +35,7 @@ const esquema = z.object({
     .nonempty("La contraseña es requerida"),
 });
 
-const InicioSesion = () => {
+const Auth = () => {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errorCorreo, setErrorCorreo] = useState<string | null>(null);
@@ -204,4 +204,4 @@ const InicioSesion = () => {
   );
 };
 
-export default InicioSesion;
+export default Auth;
