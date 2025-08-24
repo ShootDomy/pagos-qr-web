@@ -12,6 +12,12 @@ export interface IObtenerEstadoPago {
   traUuid?: string | null;
 }
 
+export type IEstadoPagoResponse = {
+  traUuid: string;
+  traEstado: "PENDIENTE" | "APROBADO" | "DECLINADO";
+  traCurrency: string;
+};
+
 export interface IObtenerTransaccionComercio {
   comUuid?: string | null;
   cliente?: string | null;
@@ -27,4 +33,5 @@ export interface IObtenerTransaccionComercioResponse {
   traMetodoPago: string;
   traEstado: "PENDIENTE" | "APROBADO" | "DECLINADO";
   fechaCreacion: string;
+  traQr: string | null;
 }

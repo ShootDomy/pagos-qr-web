@@ -1,4 +1,5 @@
 import {
+  IEstadoPagoResponse,
   IGenerarQr,
   IGenerarQrResponse,
   IObtenerEstadoPago,
@@ -13,9 +14,9 @@ export const transaccionApi = {
     return res.data;
   },
 
-  obtenerEstadoPago: async (data: IObtenerEstadoPago) => {
-    const res = await get("/transaccion/estado", {
-      params: { traUuid: data.traUuid },
+  obtenerEstadoPago: async (params: IObtenerEstadoPago) => {
+    const res = await get<IEstadoPagoResponse>("/transaccion/estado", {
+      params,
     });
     return res.data;
   },

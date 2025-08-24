@@ -12,18 +12,15 @@ import {
   FormErrorMessage,
   Heading,
   Image,
+  Input,
   InputGroup,
-  InputLeftAddon,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
+  InputLeftElement,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { Suspense, useState } from "react";
+import { DollarSign } from "lucide-react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
@@ -38,7 +35,6 @@ const esquema = z.object({
 const Principal = () => {
   const [qrImg, setQrImg] = useState<string | null>(null);
   const [traUuid, setTraUuid] = useState<string | null>(null);
-  const [estadoPago, setEstadoPago] = useState<string | null>(null);
 
   const { mutate: generarQr } = useTransaccionGenerarQR({
     onSuccess: (response: { qr: string; traUuid: string }) => {
@@ -73,13 +69,13 @@ const Principal = () => {
   };
 
   // Llamar el hook siempre, pero solo consultar si traUuid existe
-  const estadoPagoQuery = useObtenerEstadoPago({ traUuid });
+  const { data: estadoPagoQuery, refetch } = useObtenerEstadoPago(
+    { traUuid },
+    { refetchInterval: 5000 }
+  );
 
   const handleEstadoPago = () => {
-    if (estadoPagoQuery.data) {
-      setEstadoPago(estadoPagoQuery.data.traEstado);
-      console.log("Estado de pago:", estadoPagoQuery.data);
-    }
+    refetch();
   };
 
   const getColorByEstado = (estado: string | null) => {
@@ -101,8 +97,15 @@ const Principal = () => {
           <div className="w-full md:w-auto">
             <FormControl isInvalid={!!errors.traAmount}>
               <InputGroup width="200px">
-                <InputLeftAddon>$</InputLeftAddon>
-                <NumberInput
+                <InputLeftElement>
+                  <DollarSign className="text-gray-200" />
+                </InputLeftElement>
+                <Input
+                  type="number"
+                  placeholder="Monto"
+                  {...register("traAmount", { valueAsNumber: true })}
+                />
+                {/* <NumberInput
                   max={50}
                   min={0}
                   precision={2}
@@ -118,7 +121,7 @@ const Principal = () => {
                     <NumberIncrementStepper />
                     <NumberDecrementStepper />
                   </NumberInputStepper>
-                </NumberInput>
+                </NumberInput> */}
               </InputGroup>
               <FormErrorMessage>{errors.traAmount?.message}</FormErrorMessage>
             </FormControl>
@@ -156,20 +159,22 @@ const Principal = () => {
                   justifyContent="center"
                 >
                   <Badge
-                    colorScheme={getColorByEstado(estadoPago)}
+                    colorScheme={getColorByEstado(
+                      estadoPagoQuery?.traEstado ?? "PENDIENTE"
+                    )}
                     mb={4}
                     fontSize="lg"
                     px={4}
                     py={2}
                     borderRadius="md"
                   >
-                    {estadoPago ? estadoPago : "PENDIENTE"}
+                    {estadoPagoQuery ? estadoPagoQuery.traEstado : "PENDIENTE"}
                   </Badge>
                   <Heading size="lg" mb={2}>
                     ${watch("traAmount") ?? ""}
                   </Heading>
                   <Text fontSize="xl" color="gray.600" mb={4}>
-                    {qrImg ? estadoPagoQuery.data?.traCurrency ?? "" : "USD"}
+                    {qrImg ? estadoPagoQuery?.traCurrency ?? "" : "USD"}
                   </Text>
                   <Text fontSize="md" color="gray.500">
                     {traUuid ? "Transacción generada" : "Esperando generación"}

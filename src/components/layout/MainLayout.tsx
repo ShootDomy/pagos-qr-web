@@ -2,8 +2,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
-import { NavbarWrapper } from "../NavbarWrapper";
-import { FooterWrapper } from "../FooterWrapper";
+import { NavbarWrapper } from "./NavbarWrapper";
+import { FooterWrapper } from "./FooterWrapper";
 import { LoaderComponent } from "../common/LoaderComponent";
 
 interface PropsMainLayout {
@@ -15,8 +15,8 @@ const MainLayout: React.FC<PropsMainLayout> = ({ children }) => {
   const { push } = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) push("/401");
-  }, [isAuthenticated, push]);
+    if (!isAuthenticated && isLoading) push("/401");
+  }, [isAuthenticated, isLoading, push]);
 
   if (isLoading) {
     return <LoaderComponent />;
