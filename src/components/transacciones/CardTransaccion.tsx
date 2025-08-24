@@ -16,6 +16,7 @@ export const CardTransaccion: React.FC<PropsCardTransaccion> = ({ item }) => {
     traEstado,
     traMetodoPago,
     traQr,
+    traNumero,
   } = item;
 
   const {
@@ -41,9 +42,12 @@ export const CardTransaccion: React.FC<PropsCardTransaccion> = ({ item }) => {
       <div className="bg-white rounded-xl shadow-md p-4 flex flex-row items-center justify-between min-h-[140px]">
         <div className="flex flex-col gap-2 flex-1">
           <Text fontWeight="bold" fontSize="lg" color="gray.700" mb={1}>
-            {cliente}
+            <b>Número de transacción: </b> {traNumero}
           </Text>
           <Divider orientation="horizontal" />
+          <Text fontSize="md" color="gray.500">
+            <b>Cliente: </b> {cliente}
+          </Text>
           <Text fontSize="md" color="gray.500">
             <b>Monto:</b> ${" "}
             {Number(traAmount).toLocaleString("es-EC", {

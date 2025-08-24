@@ -34,4 +34,5 @@ export interface IObtenerTransaccionComercioResponse {
   traEstado: "PENDIENTE" | "APROBADO" | "DECLINADO";
   fechaCreacion: string;
   traQr: string | null;
+  traNumero: number;
 }
