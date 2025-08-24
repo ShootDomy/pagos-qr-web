@@ -12,8 +12,16 @@ import {
 import { AlignJustify, CircleChevronUp } from "lucide-react";
 import { menuData } from "@/ts/menu-data";
 
+import { useRouter } from "next/navigation";
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.dispatchEvent(new Event("tokenChange"));
+    router.push("/auth");
+  };
 
   return (
     <Box
@@ -37,11 +45,13 @@ export const Navbar = () => {
             <Button
               key={item}
               as="a"
-              href={menu.link || "#"}
+              href={menu.action === "logout" ? undefined : menu.link || "#"}
               variant="ghost"
               color="white"
               _hover={{ bg: "blue.600" }}
+              onClick={menu.action === "logout" ? handleLogout : undefined}
             >
+              {menu.icon && <menu.icon className="w-5 h-5 mr-2" />}
               {menu.nombre}
             </Button>
           ))}
@@ -65,11 +75,13 @@ export const Navbar = () => {
               <Button
                 key={item}
                 as="a"
-                href={menu.link || "#"}
+                href={menu.action === "logout" ? undefined : menu.link || "#"}
                 variant="ghost"
                 color="white"
                 _hover={{ bg: "blue.600" }}
+                onClick={menu.action === "logout" ? handleLogout : undefined}
               >
+                {menu.icon && <menu.icon className="w-5 h-5 mr-2" />}
                 {menu.nombre}
               </Button>
             ))}

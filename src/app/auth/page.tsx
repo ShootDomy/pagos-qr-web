@@ -54,7 +54,7 @@ const Auth = () => {
     resolver: zodResolver(esquema),
   });
 
-  const { mutate: iniciarSesion } = useAuth();
+  const { loginMutation } = useAuth();
   const handleIniciarSesion = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -75,7 +75,7 @@ const Auth = () => {
 
     setToken("");
 
-    iniciarSesion(
+    loginMutation.mutate(
       { usuCorreo: correo, usuContrasena: contrasena },
       {
         onSuccess: (data) => {

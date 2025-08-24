@@ -5,6 +5,8 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { NavbarWrapper } from "@/components/NavbarWrapper";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
 import { FooterWrapper } from "@/components/FooterWrapper";
+import { useAuth } from "@/hooks/useAuth";
+import ClientLayout from "@/components/ClientLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +35,7 @@ export default function RootLayout({
       >
         <ReactQueryProvider>
           <ChakraProvider>
-            <header>
-              <NavbarWrapper />
-            </header>
-            <main>{children}</main>
-            <footer>
-              <FooterWrapper />
-            </footer>
+            <ClientLayout>{children}</ClientLayout>
           </ChakraProvider>
         </ReactQueryProvider>
       </body>
