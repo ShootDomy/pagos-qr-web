@@ -1,28 +1,34 @@
 import { usuarioApi } from "@/api/usuario";
 import {
+  IUsuarioDecoded,
   IUsuarioInicioSesion,
   IUsuarioLoginResponse,
 } from "@/ts/models/usuario";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-
+import Cookies from "js-cookie";
+import { TOKEN_COOKIE } from "@/utils/constants";
+import { isNil, set } from "lodash";
+import { jwtDecode } from "jwt-decode";
 export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [usuario, setUsuario] = useState<IUsuarioDecoded | null>(null);
 
   useEffect(() => {
-    const checkToken = () =>
-      setIsAuthenticated(!!localStorage.getItem("token"));
-    checkToken();
+    setIsLoading(true);
+    const token = Cookies.get(TOKEN_COOKIE);
 
-    window.addEventListener("storage", checkToken);
-    // Evento personalizado para cambios locales
-    const handleTokenChange = () => checkToken();
-    window.addEventListener("tokenChange", handleTokenChange);
+    if (isNil(token)) {
+      setIsAuthenticated(false);
+      setUsuario(null);
+      return;
+    }
 
-    return () => {
-      window.removeEventListener("storage", checkToken);
-      window.removeEventListener("tokenChange", handleTokenChange);
-    };
+    const decoded = jwtDecode<IUsuarioDecoded>(token);
+    setUsuario(decoded);
+    setIsAuthenticated(true);
+    setIsLoading(false);
   }, []);
 
   const loginMutation = useMutation<
@@ -32,8 +38,7 @@ export const useAuth = () => {
   >({
     mutationFn: usuarioApi.iniciarSesion,
     onSuccess: (data) => {
-      localStorage.setItem("token", data.token);
-      window.dispatchEvent(new Event("tokenChange"));
+      Cookies.set(TOKEN_COOKIE, data.token);
       console.log("Sesión iniciada ✅", data);
     },
     onError: (error) => {
@@ -41,5 +46,5 @@ export const useAuth = () => {
     },
   });
 
-  return { isAuthenticated, loginMutation };
+  return { isAuthenticated, loginMutation, usuario, isLoading };
 };

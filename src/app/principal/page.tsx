@@ -1,4 +1,5 @@
 "use client";
+import MainLayout from "@/components/layout/MainLayout";
 import { useObtenerEstadoPago } from "@/hooks/useObtenerEstadoPago";
 import { useTransaccionGenerarQR } from "@/hooks/useTransaccionGenerarQR";
 import {
@@ -22,7 +23,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
@@ -94,103 +95,105 @@ const Principal = () => {
   };
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center bg-[#f7f7fa] p-4">
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-6 rounded-lg shadow-md mb-8 w-full max-w-md">
-        <div className="w-full md:w-auto">
-          <FormControl isInvalid={!!errors.traAmount}>
-            <InputGroup width="200px">
-              <InputLeftAddon>$</InputLeftAddon>
-              <NumberInput
-                max={50}
-                min={0}
-                precision={2}
-                step={0.01}
-                width="100%"
-                focusBorderColor="purple.400"
-              >
-                <NumberInputField
-                  placeholder="Monto"
-                  {...register("traAmount", { valueAsNumber: true })}
-                />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </InputGroup>
-            <FormErrorMessage>{errors.traAmount?.message}</FormErrorMessage>
-          </FormControl>
-        </div>
-        <Button
-          colorScheme="purple"
-          width="full"
-          mt={{ base: 4, md: 0 }}
-          onClick={handleSubmit(onSuccess, onError)}
-        >
-          Generar código QR
-        </Button>
-      </div>
-      <div>
-        {qrImg ? (
-          <Card
-            direction={{ base: "column", sm: "row" }}
-            overflow="hidden"
-            variant="outline"
+    <MainLayout>
+      <div className="w-full h-full flex-1 flex flex-col items-center justify-center bg-[#f7f7fa] p-4 ">
+        <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-6 rounded-lg shadow-md mb-8 w-full max-w-md ">
+          <div className="w-full md:w-auto">
+            <FormControl isInvalid={!!errors.traAmount}>
+              <InputGroup width="200px">
+                <InputLeftAddon>$</InputLeftAddon>
+                <NumberInput
+                  max={50}
+                  min={0}
+                  precision={2}
+                  step={0.01}
+                  width="100%"
+                  focusBorderColor="purple.400"
+                >
+                  <NumberInputField
+                    placeholder="Monto"
+                    {...register("traAmount", { valueAsNumber: true })}
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </InputGroup>
+              <FormErrorMessage>{errors.traAmount?.message}</FormErrorMessage>
+            </FormControl>
+          </div>
+          <Button
+            colorScheme="purple"
+            width="full"
+            mt={{ base: 4, md: 0 }}
+            onClick={handleSubmit(onSuccess, onError)}
           >
-            <Image
-              objectFit="contain"
-              // maxW={{ base: "100%", sm: "200px" }}
-              height="100%"
-              src={qrImg}
-              alt="QR generado"
-              bg="white"
-            />
+            Generar código QR
+          </Button>
+        </div>
+        <div>
+          {qrImg ? (
+            <Card
+              direction={{ base: "column", sm: "row" }}
+              overflow="hidden"
+              variant="outline"
+            >
+              <Image
+                objectFit="contain"
+                // maxW={{ base: "100%", sm: "200px" }}
+                height="100%"
+                src={qrImg}
+                alt="QR generado"
+                bg="white"
+              />
 
-            <Stack>
-              <CardBody
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Badge
-                  colorScheme={getColorByEstado(estadoPago)}
-                  mb={4}
-                  fontSize="lg"
-                  px={4}
-                  py={2}
-                  borderRadius="md"
+              <Stack>
+                <CardBody
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="center"
                 >
-                  {estadoPago ? estadoPago : "PENDIENTE"}
-                </Badge>
-                <Heading size="lg" mb={2}>
-                  ${watch("traAmount") ?? ""}
-                </Heading>
-                <Text fontSize="xl" color="gray.600" mb={4}>
-                  {qrImg ? estadoPagoQuery.data?.traCurrency ?? "" : "USD"}
-                </Text>
-                <Text fontSize="md" color="gray.500">
-                  {traUuid ? "Transacción generada" : "Esperando generación"}
-                </Text>
-              </CardBody>
+                  <Badge
+                    colorScheme={getColorByEstado(estadoPago)}
+                    mb={4}
+                    fontSize="lg"
+                    px={4}
+                    py={2}
+                    borderRadius="md"
+                  >
+                    {estadoPago ? estadoPago : "PENDIENTE"}
+                  </Badge>
+                  <Heading size="lg" mb={2}>
+                    ${watch("traAmount") ?? ""}
+                  </Heading>
+                  <Text fontSize="xl" color="gray.600" mb={4}>
+                    {qrImg ? estadoPagoQuery.data?.traCurrency ?? "" : "USD"}
+                  </Text>
+                  <Text fontSize="md" color="gray.500">
+                    {traUuid ? "Transacción generada" : "Esperando generación"}
+                  </Text>
+                </CardBody>
 
-              <CardFooter>
-                <Button
-                  colorScheme="purple"
-                  width="full"
-                  mt={6}
-                  onClick={handleEstadoPago}
-                >
-                  Actualizar estado de pago
-                </Button>
-              </CardFooter>
-            </Stack>
-          </Card>
-        ) : (
-          <div style={{ width: 200, height: 200, background: "white" }} />
-        )}
+                <CardFooter>
+                  <Button
+                    colorScheme="purple"
+                    width="full"
+                    mt={6}
+                    onClick={handleEstadoPago}
+                  >
+                    Actualizar estado de pago
+                  </Button>
+                </CardFooter>
+              </Stack>
+            </Card>
+          ) : (
+            <div style={{ width: 200, height: 200, background: "white" }} />
+          )}
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

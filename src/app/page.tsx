@@ -1,21 +1,21 @@
 "use client";
 
+import { LoaderComponent } from "@/components/common/LoaderComponent";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Home() {
   const { push } = useRouter();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     setInterval(() => {
-      push("/inicio-sesion");
+      if (!isAuthenticated) push("/auth");
+      else push("principal");
     }, 5000);
-  }, [push]);
+  }, [isAuthenticated, push]);
 
-  return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center">
-      <Loader className="animate-spin" />
-    </div>
-  );
+  return <LoaderComponent />;
 }

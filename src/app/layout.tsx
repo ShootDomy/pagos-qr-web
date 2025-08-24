@@ -31,9 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReactQueryProvider>
-          <ChakraProvider>
-            <AppShell>{children}</AppShell>
-          </ChakraProvider>
+          <ChakraProvider>{children}</ChakraProvider>
         </ReactQueryProvider>
       </body>
     </html>
