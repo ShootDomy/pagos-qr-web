@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProtectedRoute({
   children,
@@ -10,14 +10,22 @@ export default function ProtectedRoute({
 }) {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Espera a que el estado se actualice
+    const timeout = setTimeout(() => setChecked(true), 100);
+    return () => clearTimeout(timeout);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (checked && !isAuthenticated) {
       router.push("/auth");
     }
-  }, [isAuthenticated, router]);
+  }, [checked, isAuthenticated, router]);
 
-  if (!isAuthenticated) return null; // No renderiza nada si no está autenticado
+  if (!checked) return null; // loading o spinner opcional
+  if (!isAuthenticated) return null;
 
   return <>{children}</>;
 }

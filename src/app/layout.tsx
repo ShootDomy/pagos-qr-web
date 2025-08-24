@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
-import { NavbarWrapper } from "@/components/NavbarWrapper";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
-import { FooterWrapper } from "@/components/FooterWrapper";
-import { useAuth } from "@/hooks/useAuth";
-import ClientLayout from "@/components/ClientLayout";
+import AppShell from "@/components/AppShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +32,7 @@ export default function RootLayout({
       >
         <ReactQueryProvider>
           <ChakraProvider>
-            <ClientLayout>{children}</ClientLayout>
+            <AppShell>{children}</AppShell>
           </ChakraProvider>
         </ReactQueryProvider>
       </body>
