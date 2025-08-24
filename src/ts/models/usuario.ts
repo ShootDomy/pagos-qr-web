@@ -13,6 +13,7 @@ export type IUsuarioDecoded = {
   usuApellido: string;
   usuCorreo: string;
   comUuid: string | null;
+  comNombre: string | null;
   iat: number;
   exp: number;
 };

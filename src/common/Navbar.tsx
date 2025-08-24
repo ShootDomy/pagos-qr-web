@@ -13,10 +13,12 @@ import { AlignJustify, CircleChevronUp } from "lucide-react";
 import { menuData } from "@/ts/menu-data";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
+  const { usuario } = useAuth();
 
   const handleLogout = () => {
     Cookies.remove("tk_pagos_qr");
@@ -33,7 +35,7 @@ export const Navbar = () => {
     >
       <Flex h={16} alignItems="center" justifyContent="space-between">
         {/* Logo */}
-        <Box fontWeight="bold">MiLogo</Box>
+        <Box fontWeight="bold">{usuario?.comNombre ?? ""}</Box>
 
         {/* Links Desktop */}
         <HStack
