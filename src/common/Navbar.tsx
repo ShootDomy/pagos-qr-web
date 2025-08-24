@@ -11,15 +11,15 @@ import {
 } from "@chakra-ui/react";
 import { AlignJustify, CircleChevronUp } from "lucide-react";
 import { menuData } from "@/ts/menu-data";
-
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.dispatchEvent(new Event("tokenChange"));
+    Cookies.remove("tk_pagos_qr");
     router.push("/auth");
   };
 

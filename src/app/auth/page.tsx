@@ -80,7 +80,6 @@ const Auth = () => {
       {
         onSuccess: (data) => {
           setToken(data.token);
-          localStorage.setItem("token", data.token);
           console.log("Inicio de sesión exitoso:", data);
           router.push("/principal");
         },

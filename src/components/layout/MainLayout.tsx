@@ -1,5 +1,4 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
 import { NavbarWrapper } from "./NavbarWrapper";

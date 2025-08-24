@@ -8,8 +8,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { TOKEN_COOKIE } from "@/utils/constants";
-import { isNil, set } from "lodash";
+import { isNil } from "lodash";
 import { jwtDecode } from "jwt-decode";
+
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

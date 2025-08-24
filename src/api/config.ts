@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/utils/constants";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const _axios = axios.create({
   baseURL: `${BASE_URL}`,
@@ -7,7 +8,8 @@ const _axios = axios.create({
 });
 
 _axios.interceptors.request.use(async (config) => {
-  const token = localStorage.getItem("token");
+  const token = Cookies.get("tk_pagos_qr");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
