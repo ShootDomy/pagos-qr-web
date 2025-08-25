@@ -8,6 +8,7 @@ import {
   Button,
   useDisclosure,
   Stack,
+  Image,
 } from "@chakra-ui/react";
 import { AlignJustify, CircleChevronUp } from "lucide-react";
 import { menuData } from "@/ts/menu-data";
@@ -35,7 +36,16 @@ export const Navbar = () => {
     >
       <Flex h={16} alignItems="center" justifyContent="space-between">
         {/* Logo */}
-        <Box fontWeight="bold">{usuario?.comNombre ?? ""}</Box>
+        <div className="flex flex-row text-2xl justify-center items-center">
+          <Image
+            src="/logo.png"
+            alt={usuario?.comNombre ?? ""}
+            boxSize="60px"
+            borderRadius="full"
+            mr={2}
+          />
+          {usuario?.comNombre ?? ""}
+        </div>
 
         {/* Links Desktop */}
         <HStack
@@ -50,7 +60,7 @@ export const Navbar = () => {
               href={menu.action === "logout" ? undefined : menu.link || "#"}
               variant="ghost"
               color="white"
-              _hover={{ bg: "blue.600" }}
+              _hover={{ bg: "#C4BEF7" }}
               onClick={menu.action === "logout" ? handleLogout : undefined}
             >
               {menu.icon && <menu.icon className="w-5 h-5 mr-2" />}
@@ -80,7 +90,7 @@ export const Navbar = () => {
                 href={menu.action === "logout" ? undefined : menu.link || "#"}
                 variant="ghost"
                 color="white"
-                _hover={{ bg: "blue.600" }}
+                _hover={{ bg: "#C4BEF7" }}
                 onClick={menu.action === "logout" ? handleLogout : undefined}
               >
                 {menu.icon && <menu.icon className="w-5 h-5 mr-2" />}
