@@ -73,8 +73,9 @@ export const ModalPrevisualizarQr: React.FC<PropsModalPrevisualizarQr> = ({
           <Image
             src={traQr}
             alt="QR"
-            width={512}
-            height={512}
+            width="100%"
+            height="auto"
+            maxWidth="512px"
             objectFit="contain"
           />
         </ModalBody>

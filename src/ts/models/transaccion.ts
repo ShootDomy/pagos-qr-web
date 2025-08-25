@@ -16,6 +16,7 @@ export type IEstadoPagoResponse = {
   traUuid: string;
   traEstado: "PENDIENTE" | "APROBADO" | "DECLINADO";
   traCurrency: string;
+  traNumero: number;
 };
 
 export interface IObtenerTransaccionComercio {

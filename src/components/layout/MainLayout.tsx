@@ -23,9 +23,11 @@ const MainLayout: React.FC<PropsMainLayout> = ({ children }) => {
 
   return (
     <Suspense fallback={<LoaderComponent />}>
-      <div className="w-screen h-screen flex flex-col">
+      <div className="w-screen h-screen flex flex-col overflow-x-hidden">
         <NavbarWrapper />
-        <div className="flex-1 h-full">{children}</div>
+        <div className="flex-1 w-full h-full">
+          <div className="overflow-y-auto">{children}</div>
+        </div>
         <FooterWrapper />
       </div>
     </Suspense>

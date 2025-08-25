@@ -27,8 +27,7 @@ import z from "zod";
 const esquema = z.object({
   traAmount: z
     .number("El monto es requerido")
-    .min(0, "El monto debe ser mayor o igual a 0")
-    .max(50, "El monto debe ser menor o igual a 50"),
+    .min(0, "El monto debe ser mayor o igual a 0"),
   comUuid: z.string().uuid().optional(),
 });
 
@@ -92,40 +91,21 @@ const Principal = () => {
 
   return (
     <MainLayout>
-      <div className="w-full h-full flex-1 flex flex-col items-center justify-center bg-[#f7f7fa] p-4 ">
-        <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-6 rounded-lg shadow-md mb-8 w-full max-w-md ">
-          <div className="w-full md:w-auto">
-            <FormControl isInvalid={!!errors.traAmount}>
-              <InputGroup width="200px">
-                <InputLeftElement>
-                  <DollarSign className="text-gray-200" />
-                </InputLeftElement>
-                <Input
-                  type="number"
-                  placeholder="Monto"
-                  {...register("traAmount", { valueAsNumber: true })}
-                />
-                {/* <NumberInput
-                  max={50}
-                  min={0}
-                  precision={2}
-                  step={0.01}
-                  width="100%"
-                  focusBorderColor="purple.400"
-                >
-                  <NumberInputField
-                    placeholder="Monto"
-                    {...register("traAmount", { valueAsNumber: true })}
-                  />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput> */}
-              </InputGroup>
-              <FormErrorMessage>{errors.traAmount?.message}</FormErrorMessage>
-            </FormControl>
-          </div>
+      <div className="w-full h-full flex flex-col gap-4 p-4 justify-center items-center">
+        <div className="flex flex-col md:flex-row gap-4 bg-white rounded-lg shadow-md p-4">
+          <FormControl isInvalid={!!errors.traAmount}>
+            <InputGroup width="200px">
+              <InputLeftElement>
+                <DollarSign className="text-gray-200" />
+              </InputLeftElement>
+              <Input
+                type="number"
+                placeholder="Monto"
+                {...register("traAmount", { valueAsNumber: true })}
+              />
+            </InputGroup>
+            <FormErrorMessage>{errors.traAmount?.message}</FormErrorMessage>
+          </FormControl>
           <Button
             colorScheme="purple"
             width="full"
@@ -135,8 +115,13 @@ const Principal = () => {
             Generar código QR
           </Button>
         </div>
-        <div>
-          {qrImg ? (
+
+        {!qrImg ? (
+          <div className="flex flex-col items-center justify-center h-52 bg-white rounded-lg shadow-md p-4">
+            <Text>No se ha generado ningún código QR</Text>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center">
             <Card
               direction={{ base: "column", sm: "row" }}
               overflow="hidden"
@@ -144,13 +129,11 @@ const Principal = () => {
             >
               <Image
                 objectFit="contain"
-                // maxW={{ base: "100%", sm: "200px" }}
                 height="100%"
                 src={qrImg}
                 alt="QR generado"
                 bg="white"
               />
-
               <Stack>
                 <CardBody
                   display="flex"
@@ -177,10 +160,18 @@ const Principal = () => {
                     {qrImg ? estadoPagoQuery?.traCurrency ?? "" : "USD"}
                   </Text>
                   <Text fontSize="md" color="gray.500">
-                    {traUuid ? "Transacción generada" : "Esperando generación"}
+                    {traUuid ? (
+                      <>
+                        QR generado con el número de transacción{" "}
+                        <span className="font-semibold">
+                          {estadoPagoQuery?.traNumero}
+                        </span>
+                      </>
+                    ) : (
+                      "Esperando generación"
+                    )}
                   </Text>
                 </CardBody>
-
                 <CardFooter>
                   <Button
                     colorScheme="purple"
@@ -193,10 +184,8 @@ const Principal = () => {
                 </CardFooter>
               </Stack>
             </Card>
-          ) : (
-            <div style={{ width: 200, height: 200, background: "white" }} />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );
