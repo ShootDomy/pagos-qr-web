@@ -91,7 +91,7 @@ const Principal = () => {
 
   return (
     <MainLayout>
-      <div className="w-full h-full flex flex-col gap-4 p-4 justify-center items-center">
+      <div className="w-full h-full flex flex-col gap-2 items-center justify-center">
         <div className="flex flex-col md:flex-row gap-4 bg-white rounded-lg shadow-md p-4">
           <FormControl isInvalid={!!errors.traAmount}>
             <InputGroup width="200px">
