@@ -3,6 +3,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useObtenerEstadoPago } from "@/hooks/useObtenerEstadoPago";
 import { useTransaccionGenerarQR } from "@/hooks/useTransaccionGenerarQR";
+import { formatDigitos } from "@/utils/functions";
 import {
   Badge,
   Button,
@@ -81,7 +82,7 @@ const Principal = () => {
 
     if (!isNil(traAmount) && !isNil(usuario?.comUuid)) {
       generarQr({
-        traAmount,
+        traAmount: parseFloat(formatDigitos(traAmount)),
         comUuid: usuario.comUuid,
       });
     }
