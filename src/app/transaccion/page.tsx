@@ -7,8 +7,12 @@ import { useObtenerTransaccionComercio } from "@/hooks/useObtenerTransaccionCome
 import { ChevronDown, Search } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { CardTransaccion } from "@/components/transacciones/CardTransaccion";
+import { useAuth } from "@/hooks/useAuth";
+import { isNil } from "lodash";
 
 const Transaccion = () => {
+  const { usuario } = useAuth();
+
   const [cliente, setCliente] = useState("");
   const [debouncedCliente, setDebouncedCliente] = useState("");
   const [estado, setEstado] = useState("");
@@ -22,8 +26,13 @@ const Transaccion = () => {
     return () => clearTimeout(handler);
   }, [cliente, estado]);
 
+  let comercio = "";
+  if (!isNil(usuario?.comUuid)) {
+    comercio = usuario.comUuid;
+  }
+
   const { data, isPending, isError } = useObtenerTransaccionComercio({
-    comUuid: "7f0cf323-a1bf-45eb-8f7a-714e354d4c2b",
+    comUuid: comercio,
     cliente: debouncedCliente,
     estado:
       debouncedEstado === ""

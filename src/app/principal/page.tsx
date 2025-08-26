@@ -24,7 +24,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isNil } from "lodash";
 import { DollarSign } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
@@ -39,6 +39,7 @@ const esquema = z.object({
 const Principal = () => {
   const toast = useToast();
   const { usuario } = useAuth();
+  const cancelPollingRef = useRef(false);
 
   const [qrImg, setQrImg] = useState<string | null>(null);
   const [traUuid, setTraUuid] = useState<string | null>(null);
@@ -104,9 +105,16 @@ const Principal = () => {
   };
 
   const handleEstadoPagoConToast = () => {
+    cancelPollingRef.current = false;
     const pollEstado = () =>
       new Promise((resolve, reject) => {
         const interval = setInterval(async () => {
+          if (cancelPollingRef.current) {
+            clearInterval(interval);
+            resolve("cancelado");
+            return;
+          }
+
           const result = await refetch();
           const estado = result.data?.traEstado;
           if (estado && estado !== "PENDIENTE") {
@@ -121,15 +129,26 @@ const Principal = () => {
       });
 
     toast.promise(pollEstado(), {
-      success: {
-        title: "Pago aprobado",
-        description: "El pago fue exitoso",
-        position: "top-right",
-      },
+      success: (data) =>
+        data === "cancelado"
+          ? {
+              title: "Transacción cancelada",
+              description: "El pago fue cancelado",
+              status: "warning",
+              isClosable: true,
+              duration: 2000,
+            }
+          : {
+              title: "Pago aprobado",
+              description: "El pago fue exitoso",
+              isClosable: true,
+              duration: 2000,
+            },
       error: {
         title: "Pago rechazado",
         description: "El pago fue rechazado",
-        position: "top-right",
+        isClosable: true,
+        duration: 2000,
       },
       loading: {
         title: "Procesando pago",
@@ -156,6 +175,7 @@ const Principal = () => {
     setTraUuid(null);
     setEstadoQR(false);
     reset({ traAmount: null });
+    cancelPollingRef.current = true;
   };
 
   return (
