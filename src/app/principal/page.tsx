@@ -1,5 +1,6 @@
 "use client";
 import MainLayout from "@/components/layout/MainLayout";
+import { useAuth } from "@/hooks/useAuth";
 import { useObtenerEstadoPago } from "@/hooks/useObtenerEstadoPago";
 import { useTransaccionGenerarQR } from "@/hooks/useTransaccionGenerarQR";
 import {
@@ -19,6 +20,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isNil } from "lodash";
 import { DollarSign } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,20 +29,26 @@ import z from "zod";
 const esquema = z.object({
   traAmount: z
     .number("El monto es requerido")
-    .min(0, "El monto debe ser mayor o igual a 0"),
+    .min(0, "El monto debe ser mayor o igual a 0")
+    .nullish(),
   comUuid: z.string().uuid().optional(),
 });
 
 const Principal = () => {
   const [qrImg, setQrImg] = useState<string | null>(null);
   const [traUuid, setTraUuid] = useState<string | null>(null);
+  const [estadoQR, setEstadoQR] = useState<boolean>(false);
 
-  const { mutate: generarQr } = useTransaccionGenerarQR({
+  const { usuario } = useAuth();
+
+  const { mutate: generarQr, isPending } = useTransaccionGenerarQR({
     onSuccess: (response: { qr: string; traUuid: string }) => {
       setQrImg(response.qr);
       setTraUuid(response.traUuid);
+      setEstadoQR(true);
       console.log(response);
     },
+
     onError: (error: unknown) => {
       console.log("Error al generar QR:", error);
     },
@@ -51,15 +59,20 @@ const Principal = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = useForm<z.infer<typeof esquema>>({
     resolver: zodResolver(esquema),
   });
 
   const onSuccess = (data: z.infer<typeof esquema>) => {
-    generarQr({
-      ...data,
-      comUuid: data.comUuid || "7f0cf323-a1bf-45eb-8f7a-714e354d4c2b",
-    });
+    const { traAmount } = data;
+
+    if (!isNil(traAmount) && !isNil(usuario?.comUuid)) {
+      generarQr({
+        traAmount,
+        comUuid: usuario.comUuid,
+      });
+    }
     console.log(data);
   };
 
@@ -68,10 +81,11 @@ const Principal = () => {
   };
 
   // Llamar el hook siempre, pero solo consultar si traUuid existe
-  const { data: estadoPagoQuery, refetch } = useObtenerEstadoPago(
-    { traUuid },
-    { refetchInterval: 5000 }
-  );
+  const {
+    data: estadoPagoQuery,
+    refetch,
+    dataUpdatedAt,
+  } = useObtenerEstadoPago({ traUuid }, { refetchInterval: 5000 });
 
   const handleEstadoPago = () => {
     refetch();
@@ -89,6 +103,13 @@ const Principal = () => {
     }
   };
 
+  const handleResetearQr = () => {
+    setQrImg(null);
+    setTraUuid(null);
+    setEstadoQR(false);
+    reset({ traAmount: null });
+  };
+
   return (
     <MainLayout>
       <div className="w-full h-full flex flex-col gap-2 items-center justify-center">
@@ -101,19 +122,35 @@ const Principal = () => {
               <Input
                 type="number"
                 placeholder="Monto"
+                isDisabled={estadoQR}
                 {...register("traAmount", { valueAsNumber: true })}
               />
             </InputGroup>
             <FormErrorMessage>{errors.traAmount?.message}</FormErrorMessage>
           </FormControl>
-          <Button
-            colorScheme="purple"
-            width="full"
-            mt={{ base: 4, md: 0 }}
-            onClick={handleSubmit(onSuccess, onError)}
-          >
-            Generar código QR
-          </Button>
+          {!estadoQR ? (
+            <Button
+              colorScheme="purple"
+              width="full"
+              isDisabled={isPending}
+              isLoading={isPending}
+              mt={{ base: 4, md: 0 }}
+              onClick={handleSubmit(onSuccess, onError)}
+            >
+              Generar código QR
+            </Button>
+          ) : (
+            <Button
+              colorScheme="purple"
+              width="full"
+              isDisabled={isPending}
+              isLoading={isPending}
+              mt={{ base: 4, md: 0 }}
+              onClick={handleResetearQr}
+            >
+              Generar nuevo código QR
+            </Button>
+          )}
         </div>
 
         {!qrImg ? (
@@ -173,14 +210,23 @@ const Principal = () => {
                   </Text>
                 </CardBody>
                 <CardFooter>
-                  <Button
-                    colorScheme="purple"
-                    width="full"
-                    mt={6}
-                    onClick={handleEstadoPago}
-                  >
-                    Actualizar estado de pago
-                  </Button>
+                  <div className="w-full flex flex-col items-center justify-center pb-2">
+                    <Button
+                      colorScheme="purple"
+                      width="full"
+                      mt={6}
+                      onClick={handleEstadoPago}
+                    >
+                      Actualizar estado de pago
+                    </Button>
+                    <Text fontSize="xs" color="gray.300">
+                      {dataUpdatedAt
+                        ? `Actualizado el ${new Date(
+                            dataUpdatedAt
+                          ).toLocaleString()}`
+                        : "Sin datos actualizados"}
+                    </Text>
+                  </div>
                 </CardFooter>
               </Stack>
             </Card>
