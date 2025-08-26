@@ -9,6 +9,7 @@ import {
   Input,
   Heading,
   FormErrorMessage,
+  useToast,
 } from "@chakra-ui/react";
 import React, { Suspense, useState } from "react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -39,6 +40,7 @@ const esquema = z.object({
 
 const Auth = () => {
   const router = useRouter();
+  const toast = useToast();
 
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -61,6 +63,14 @@ const Auth = () => {
     if (!correo || (correo !== undefined && correo.trim() === "")) {
       console.log("Por favor ingresa un correo válido.");
       setErrorCorreo("Por favor ingresa un correo válido.");
+
+      toast({
+        title: "Credenciales incorrectas",
+        description: "Por favor verifica tu correo y contraseña.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
       return;
     }
     setErrorCorreo(null);
@@ -68,6 +78,13 @@ const Auth = () => {
     if (!contrasena || (contrasena !== undefined && contrasena.trim() === "")) {
       console.log("Por favor ingresa una contraseña válida.");
       setErrorContrasena("Por favor ingresa una contraseña válida.");
+      toast({
+        title: "Credenciales incorrectas",
+        description: "Por favor verifica tu correo y contraseña.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
       return;
     }
 
@@ -81,6 +98,13 @@ const Auth = () => {
         onSuccess: (data) => {
           setToken(data.token);
           console.log("Inicio de sesión exitoso:", data);
+          toast({
+            title: "Inicio de sesión exitoso",
+            description: "Bienvenido de nuevo!",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
           router.push("/principal");
         },
         onError: (error) => {

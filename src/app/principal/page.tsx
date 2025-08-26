@@ -18,6 +18,7 @@ import {
   InputLeftElement,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isNil } from "lodash";
@@ -35,18 +36,29 @@ const esquema = z.object({
 });
 
 const Principal = () => {
+  const toast = useToast();
+  const { usuario } = useAuth();
+
   const [qrImg, setQrImg] = useState<string | null>(null);
   const [traUuid, setTraUuid] = useState<string | null>(null);
   const [estadoQR, setEstadoQR] = useState<boolean>(false);
 
-  const { usuario } = useAuth();
-
   const { mutate: generarQr, isPending } = useTransaccionGenerarQR({
-    onSuccess: (response: { qr: string; traUuid: string }) => {
+    onSuccess: async (response: { qr: string; traUuid: string }) => {
       setQrImg(response.qr);
       setTraUuid(response.traUuid);
       setEstadoQR(true);
       console.log(response);
+
+      await toast({
+        title: "QR generado exitosamente",
+        description: "Escanea el código QR para continuar con el pago.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      handleEstadoPagoConToast();
     },
 
     onError: (error: unknown) => {
@@ -80,7 +92,6 @@ const Principal = () => {
     console.log("Errores de validación:", error);
   };
 
-  // Llamar el hook siempre, pero solo consultar si traUuid existe
   const {
     data: estadoPagoQuery,
     refetch,
@@ -89,6 +100,42 @@ const Principal = () => {
 
   const handleEstadoPago = () => {
     refetch();
+  };
+
+  const handleEstadoPagoConToast = () => {
+    const pollEstado = () =>
+      new Promise((resolve, reject) => {
+        const interval = setInterval(async () => {
+          const result = await refetch();
+          const estado = result.data?.traEstado;
+          if (estado && estado !== "PENDIENTE") {
+            clearInterval(interval);
+            if (estado === "APROBADO") {
+              resolve(result.data);
+            } else {
+              reject(result.data);
+            }
+          }
+        }, 2000);
+      });
+
+    toast.promise(pollEstado(), {
+      success: {
+        title: "Pago aprobado",
+        description: "El pago fue exitoso",
+        position: "top-right",
+      },
+      error: {
+        title: "Pago rechazado",
+        description: "El pago fue rechazado",
+        position: "top-right",
+      },
+      loading: {
+        title: "Procesando pago",
+        description: "Esperando confirmación...",
+        position: "top-right",
+      },
+    });
   };
 
   const getColorByEstado = (estado: string | null) => {
@@ -137,7 +184,7 @@ const Principal = () => {
               mt={{ base: 4, md: 0 }}
               onClick={handleSubmit(onSuccess, onError)}
             >
-              Generar código QR
+              Generar código de pago
             </Button>
           ) : (
             <Button
@@ -148,7 +195,7 @@ const Principal = () => {
               mt={{ base: 4, md: 0 }}
               onClick={handleResetearQr}
             >
-              Generar nuevo código QR
+              Generar nuevo código de pago
             </Button>
           )}
         </div>
