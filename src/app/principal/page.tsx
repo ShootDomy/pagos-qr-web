@@ -3,7 +3,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useObtenerEstadoPago } from "@/hooks/useObtenerEstadoPago";
 import { useTransaccionGenerarQR } from "@/hooks/useTransaccionGenerarQR";
-import { formatDigitos } from "@/utils/functions";
+import { redondearDecimales } from "@/utils/functions";
 import {
   Badge,
   Button,
@@ -79,11 +79,13 @@ const Principal = () => {
   });
 
   const onSuccess = (data: z.infer<typeof esquema>) => {
+    console.log("data", data);
     const { traAmount } = data;
 
     if (!isNil(traAmount) && !isNil(usuario?.comUuid)) {
+      console.log("traAmount", redondearDecimales(traAmount, 2));
       generarQr({
-        traAmount: parseFloat(formatDigitos(traAmount)),
+        traAmount: redondearDecimales(traAmount, 2),
         comUuid: usuario.comUuid,
       });
     }
