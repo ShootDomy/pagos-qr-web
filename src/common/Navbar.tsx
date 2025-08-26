@@ -15,6 +15,7 @@ import { menuData } from "@/ts/menu-data";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { TOKEN_COOKIE } from "@/utils/constants";
 
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -22,7 +23,7 @@ export const Navbar = () => {
   const { usuario } = useAuth();
 
   const handleLogout = () => {
-    Cookies.remove("tk_pagos_qr");
+    Cookies.remove(TOKEN_COOKIE);
     router.push("/auth");
   };
 

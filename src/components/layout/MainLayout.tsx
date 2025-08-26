@@ -1,6 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
 import { NavbarWrapper } from "./NavbarWrapper";
 import { FooterWrapper } from "./FooterWrapper";
 import { LoaderComponent } from "../common/LoaderComponent";
@@ -10,12 +9,7 @@ interface PropsMainLayout {
 }
 
 const MainLayout: React.FC<PropsMainLayout> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const { push } = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated && isLoading) push("/401");
-  }, [isAuthenticated, isLoading, push]);
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return <LoaderComponent />;

@@ -17,7 +17,6 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 
 const esquema = z.object({
   nombre: z
@@ -39,14 +38,12 @@ const esquema = z.object({
 });
 
 const Auth = () => {
-  const router = useRouter();
   const toast = useToast();
 
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errorCorreo, setErrorCorreo] = useState<string | null>(null);
   const [errorContrasena, setErrorContrasena] = useState<string | null>(null);
-  const [token, setToken] = useState<string>("");
 
   const {
     register,
@@ -56,7 +53,9 @@ const Auth = () => {
     resolver: zodResolver(esquema),
   });
 
-  const { loginMutation } = useAuth();
+  const {
+    loginMutation: { mutate },
+  } = useAuth();
   const handleIniciarSesion = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -90,13 +89,10 @@ const Auth = () => {
 
     setErrorContrasena(null);
 
-    setToken("");
-
-    loginMutation.mutate(
+    mutate(
       { usuCorreo: correo, usuContrasena: contrasena },
       {
         onSuccess: (data) => {
-          setToken(data.token);
           console.log("Inicio de sesión exitoso:", data);
           toast({
             title: "Inicio de sesión exitoso",
@@ -105,7 +101,6 @@ const Auth = () => {
             duration: 5000,
             isClosable: true,
           });
-          router.push("/principal");
         },
         onError: (error) => {
           console.error("Error al iniciar sesión:", error);
@@ -149,7 +144,7 @@ const Auth = () => {
               <br />
               <TabPanels className="">
                 <TabPanel>
-                  <form className="space-y-3.5" onSubmit={handleIniciarSesion}>
+                  <div className="space-y-3.5">
                     <FormControl isInvalid={!!errorCorreo}>
                       <FormLabel>Correo:</FormLabel>
                       <Input
@@ -174,14 +169,14 @@ const Auth = () => {
                     </FormControl>
 
                     <Button
-                      type="submit"
+                      onClick={handleIniciarSesion}
                       colorScheme="purple"
                       width="full"
                       mt={6}
                     >
                       Iniciar Sesión
                     </Button>
-                  </form>
+                  </div>
                 </TabPanel>
                 <TabPanel>
                   <FormControl isInvalid={!!errors.nombre}>

@@ -10,26 +10,36 @@ import Cookies from "js-cookie";
 import { TOKEN_COOKIE } from "@/utils/constants";
 import { isNil } from "lodash";
 import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
 
 export const useAuth = () => {
+  const { push } = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [usuario, setUsuario] = useState<IUsuarioDecoded | null>(null);
 
   useEffect(() => {
-    setIsLoading(true);
-    const token = Cookies.get(TOKEN_COOKIE);
+    try {
+      setIsLoading(true);
+      const token = Cookies.get(TOKEN_COOKIE);
 
-    if (isNil(token)) {
-      setIsAuthenticated(false);
-      setUsuario(null);
-      return;
+      if (isNil(token)) {
+        setIsAuthenticated(false);
+        setUsuario(null);
+        push("/auth");
+        return;
+      }
+
+      const decoded = jwtDecode<IUsuarioDecoded>(token);
+      setUsuario(decoded);
+      setIsAuthenticated(true);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error al verificar token ❌", error);
+    } finally {
+      setIsLoading(false);
     }
-
-    const decoded = jwtDecode<IUsuarioDecoded>(token);
-    setUsuario(decoded);
-    setIsAuthenticated(true);
-    setIsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loginMutation = useMutation<
@@ -41,6 +51,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       Cookies.set(TOKEN_COOKIE, data.token);
       console.log("Sesión iniciada ✅", data);
+      push("/principal");
     },
     onError: (error) => {
       console.error("Error en login ❌", error.message);
