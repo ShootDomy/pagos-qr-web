@@ -56,10 +56,18 @@ const Auth = () => {
   const {
     loginMutation: { mutate },
   } = useAuth();
+
   const handleIniciarSesion = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!correo || (correo !== undefined && correo.trim() === "")) {
+    console.log("Correo:", correo);
+    console.log("Contraseña:", contrasena);
+
+    const esCorreoValido = (correo: string) => {
+      return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo.trim());
+    };
+
+    if (!correo || !esCorreoValido(correo)) {
       console.log("Por favor ingresa un correo válido.");
       setErrorCorreo("Por favor ingresa un correo válido.");
 
@@ -72,6 +80,7 @@ const Auth = () => {
       });
       return;
     }
+
     setErrorCorreo(null);
 
     if (!contrasena || (contrasena !== undefined && contrasena.trim() === "")) {
